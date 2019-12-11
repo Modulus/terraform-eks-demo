@@ -24,7 +24,7 @@ module "network" {
     private_subnets = local.private_subnets
     public_subnets = local.public_subnets
     name = "fargate-test"
-    managed_by = "tv2i"
+    managed_by = "sjefen"
     azs = local.azs
     tags = {
         "kubernetes.io/cluster/${local.cluster_name}" = "shared"
@@ -56,6 +56,16 @@ module "blue_cluster" {
 #     enable_fargate = true
 #     fargate_namespaces = ["demo"]
 # }
+
+module "alb" {
+    source = "./modules/loadbalancer"
+    name = "${local.cluster_name}-alb"
+
+    subnet_ids = module.network.public_subnet_ids
+
+    security_group_ids = []
+
+}
 
 output "private_subnet_ids" {
     value = module.network.private_subnet_ids

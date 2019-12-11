@@ -30,7 +30,7 @@ variable "name" {
 }
 
 variable "managed_by" {
-  default = "tv2i"
+  default = "chief"
   description = "Who is managing this network"
 }
 
