@@ -1,7 +1,8 @@
 locals {
-    vpc_cidr = "172.22.80.0/21"
-    private_subnets = ["172.22.80.0/24", "172.22.81.0/24", "172.22.82.0/24"]
-    public_subnets = ["172.22.83.0/24", "172.22.84.0/24", "172.22.85.0/24"]
+
+    vpc_cidr = "10.168.192.0/18"
+    private_subnets = ["10.168.192.0/20", "10.168.208.0/20", "10.168.224.0/20"]
+    public_subnets = ["10.168.240.0/22", "10.168.244.0/22", "10.168.248.0/22"]
 
     region = "eu-west-1"
     azs = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
@@ -38,13 +39,23 @@ module "network" {
 
 module "blue_cluster" {
     source = "./modules/eks"
-    cluster_name = local.cluster_name
+    cluster_name = "${local.cluster_name}-blue"
     vpc_id = module.network.vpc_id
 
     subnet_ids = module.network.private_subnet_ids
     enable_fargate = true
     fargate_namespaces = ["demo"]
 }
+
+# module "green_cluster" {
+#     source = "./modules/eks"
+#     cluster_name = "${local.cluster_name}-green"
+#     vpc_id = module.network.vpc_id
+
+#     subnet_ids = module.network.private_subnet_ids
+#     enable_fargate = true
+#     fargate_namespaces = ["demo"]
+# }
 
 output "private_subnet_ids" {
     value = module.network.private_subnet_ids
@@ -69,3 +80,16 @@ output "blue_node_groups" {
 output "blue_status" {
     value = module.blue_cluster.status
 }
+
+
+# output "green_id" {
+#     value = module.green_cluster.id
+# }
+
+# output "green_node_groups" {
+#     value = module.green_cluster.node_groups
+# }
+
+# output "green_status" {
+#     value = module.green_cluster.status
+# }
