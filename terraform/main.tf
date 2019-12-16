@@ -34,6 +34,13 @@ module "network" {
     subnet_tags = {
         "kubernetes.io/cluster/${local.cluster_name}-blue" = "shared"
         purpose = "test"
+        "kubernetes.io/role/internal-elb" = 1
+    }
+
+    public_subnet_tags = {
+        "kubernetes.io/cluster/${local.cluster_name}-blue" = "shared"
+        purpose = "test"
+        "kubernetes.io/role/elb" = 1
     }
 }
 

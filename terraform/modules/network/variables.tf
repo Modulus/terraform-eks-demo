@@ -57,3 +57,10 @@ variable "subnet_tags" {
     
   }
 }
+
+
+variable "public_subnet_tags" {
+  default = {
+    
+  }
+}

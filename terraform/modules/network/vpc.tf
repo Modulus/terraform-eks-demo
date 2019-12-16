@@ -85,13 +85,16 @@ resource "aws_subnet" "public_subnets" {
   availability_zone = var.azs[count.index]
 
   map_public_ip_on_launch = true
-
-  tags = {
-    Name = "${var.name}-public-subnet-${var.azs[count.index]}"
+  tags = merge({
+    Name = "${var.name}-private-subnet-${var.azs[count.index]}"
     Type = "public"
     Tool = "terraform"
     az = var.azs[count.index]
-  }
+  }, var.public_subnet_tags)
+
+
+
+
   depends_on = [
     aws_vpc.main_vpc
   ]
