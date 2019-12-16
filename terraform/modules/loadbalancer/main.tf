@@ -11,6 +11,6 @@ resource "aws_lb" "alb" {
 
   
 
-  security_groups = var.security_group_ids
+  # security_groups = var.security_group_ids
 
 }

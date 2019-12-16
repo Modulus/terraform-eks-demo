@@ -26,6 +26,8 @@ resource "aws_subnet" "private_subnets" {
   cidr_block = var.private_subnets[count.index]
   availability_zone = var.azs[count.index]
 
+  map_public_ip_on_launch = false
+
   tags = merge({
     Name = "${var.name}-private-subnet-${var.azs[count.index]}"
     Type = "private"

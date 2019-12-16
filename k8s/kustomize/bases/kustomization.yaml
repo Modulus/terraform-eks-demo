@@ -1,0 +1,20 @@
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+# nameSuffix: -base
+commonLabels:
+  owner: sjefen
+  app: core
+  env: base
+commonAnnotations:
+  adminEmail: denada@null.dev
+resources:
+  - roles.yaml
+  - metrics-server/0.3.6/aggregated-metrics-reader.yaml
+  - metrics-server/0.3.6/auth-delegator.yaml
+  - metrics-server/0.3.6/auth-reader.yaml
+  - metrics-server/0.3.6/metrics-apiservice.yaml
+  - metrics-server/0.3.6/metrics-server-deployment.yaml
+  - metrics-server/0.3.6/metrics-server-service.yaml
+  - metrics-server/0.3.6/resource-reader.yaml
+  - cluster-autoscaler/cluster-autoscaler-autodiscover.yaml

@@ -1,0 +1,28 @@
+apiVersion: v1
+data:
+  mapRoles: |
+    - groups:
+      - system:bootstrappers
+      - system:nodes
+      rolearn: arn:aws:iam::417643524488:role/eks-node-group-fargate-test-blue
+      username: system:node:{{EC2PrivateDNSName}}
+    - groups:
+      - system:bootstrappers
+      - system:nodes
+      - system:node-proxier
+      rolearn: arn:aws:iam::417643524488:role/eks-fargate-profile
+      username: system:node:{{SessionName}}
+  mapUsers: |
+    - userarn: arn:aws:iam::417643524488:user/dag
+      username: dag
+      groups:
+        - demo-admin
+    - userarn: arn:aws:iam::417643524488:user/john
+      username: john
+      groups:
+        - system:masters
+kind: ConfigMap
+metadata:
+  name: aws-auth
+  namespace: kube-system
+

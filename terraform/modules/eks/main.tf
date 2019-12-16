@@ -89,6 +89,34 @@ resource "aws_iam_role" "eks_node_group_iam_role" {
   })
 }
 
+
+resource "aws_iam_policy" "autoscaling_policy" {
+  name        = "${aws_eks_cluster.cluster.name}_autoscaling_policy"
+  path        = "/"
+  description = "${aws_eks_cluster.cluster.name} autoscaling policy"
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "autoscaling:DescribeAutoScalingGroups",
+        "autoscaling:DescribeAutoScalingInstances",
+        "autoscaling:DescribeLaunchConfigurations",
+        "autoscaling:DescribeTags",
+        "autoscaling:SetDesiredCapacity",
+        "autoscaling:TerminateInstanceInAutoScalingGroup",
+        "ec2:DescribeLaunchTemplateVersions"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+}
+
 resource "aws_iam_role_policy_attachment" "amazonEKSWorkerNodePolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
   role       = aws_iam_role.eks_node_group_iam_role.name
@@ -104,12 +132,26 @@ resource "aws_iam_role_policy_attachment" "amazonEC2ContainerRegistryReadOnly" {
   role       = aws_iam_role.eks_node_group_iam_role.name
 }
 
+resource "aws_iam_role_policy_attachment" "amazonEKSWorkerNodeAutoscalingPolicy" {
+  policy_arn = aws_iam_policy.autoscaling_policy.arn
+  role       = aws_iam_role.eks_node_group_iam_role.name
+}
 
 resource "aws_eks_node_group" "main_group" {
   cluster_name    = var.cluster_name
   node_group_name = "${var.cluster_name}-node-group"
   node_role_arn   = aws_iam_role.eks_node_group_iam_role.arn
   subnet_ids      = var.subnet_ids
+
+  labels = {
+    cluster = aws_eks_cluster.cluster.name
+  }
+
+
+  tags = {
+    cluster = aws_eks_cluster.cluster.name
+  }
+
 
   instance_types = var.instance_types
 

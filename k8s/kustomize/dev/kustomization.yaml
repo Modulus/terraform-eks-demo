@@ -1,0 +1,29 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+# nameSuffix: -base
+commonLabels:
+  owner: sjefen
+  app: core
+  env: dev
+bases:
+  - ../bases
+resources:
+  - ns.yaml
+  - cluster-autoscaler/cluster-autoscaler-autodiscover.yaml
+patchesStrategicMerge:
+  - patches/roles.yaml
+  # - patches/aws-auth-cm.yaml
+configMapGenerator:
+  - name: demo-config
+
+    behavior: create
+    literals:
+      - DNS_NAME=dev-jenkins.example.com
+      - APP=jenkins
+# TODO: FINISH THIS
+  - name: aws-auth
+    behavior: create
+    files:
+      - patches/aws-auth-cm.yaml
+generatorOptions:
+  disableNameSuffixHash: true

@@ -5,12 +5,14 @@ resource "aws_eks_fargate_profile" "eks_fargate_profile" {
   pod_execution_role_arn = aws_iam_role.pod_iam_role.arn
   subnet_ids             = var.subnet_ids
 
-    //TODO: Create dynamic list of namespaces
-
     dynamic "selector" {
         for_each = var.fargate_namespaces
         content {
             namespace = selector.value
+
+            # labels = {
+
+            # }
         }
     }
 

@@ -27,12 +27,12 @@ module "network" {
     managed_by = "sjefen"
     azs = local.azs
     tags = {
-        "kubernetes.io/cluster/${local.cluster_name}" = "shared"
+        "kubernetes.io/cluster/${local.cluster_name}-blue" = "shared"
         purpose = "test"
     }
 
     subnet_tags = {
-        "kubernetes.io/cluster/${local.cluster_name}" = "shared"
+        "kubernetes.io/cluster/${local.cluster_name}-blue" = "shared"
         purpose = "test"
     }
 }
