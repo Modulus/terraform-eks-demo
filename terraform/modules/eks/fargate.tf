@@ -10,9 +10,9 @@ resource "aws_eks_fargate_profile" "eks_fargate_profile" {
         content {
             namespace = selector.value
 
-            # labels = {
-
-            # }
+            labels = {
+              aws = "fargate"
+            }
         }
     }
 
