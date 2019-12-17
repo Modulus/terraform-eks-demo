@@ -52,7 +52,10 @@ module "blue_cluster" {
     subnet_ids = module.network.private_subnet_ids
     enable_fargate = true
     fargate_namespaces = ["demo"]
+
+    instance_types = ["t3.medium"]
 }
+
 
 # module "green_cluster" {
 #     source = "./modules/eks"
@@ -71,8 +74,68 @@ module "alb" {
     subnet_ids = module.network.public_subnet_ids
 
     security_group_ids = []
-
 }
+
+resource "aws_lb_target_group" "active_ingress_target_group" {
+  name = "active-ingress-target-group"
+  port = 30080
+  protocol = "HTTP"
+  target_type = "instance"
+  vpc_id = module.network.vpc_id
+
+  health_check  {
+    path    = "/nginx-health"
+    matcher = "200-299"
+    port    = 30080
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_alb_listener" "alb_listener_all" {
+  load_balancer_arn = module.alb.arn
+  port              = "80"
+#   ssl_policy        = "ELBSecurityPolicy-FS-1-2-Res-2019-08" #"ELBSecurityPolicy-TLS-1-2-2017-01"
+#   certificate_arn = "arn:aws:acm:eu-north-1:417643524488:certificate/a3a8a326-40e9-4f34-b323-644c3cafd977"
+  protocol          = "HTTP"
+  default_action {
+    target_group_arn = aws_lb_target_group.active_ingress_target_group.arn
+
+    #target_group_arn = local.active == "blue" ? aws_lb_target_group.ingress_target_group.arn : aws_lb_target_group.ingress_target_group_green.arn
+    type             = "forward"
+  }
+}
+
+
+# resource "aws_lb_listener_rule" "active_lb_listener_rule" {
+
+#   # Should forward to green target group if active is set to blue
+#   listener_arn = aws_alb_listener.alb_listener_all.arn
+#   action {
+#     type = "forward"
+#     #target_group_arn = local.active == "blue" ? aws_lb_target_group.ingress_target_group_green.arn : aws_lb_target_group.ingress_target_group.arn
+#     target_group_arn = aws_lb_target_group.active_ingress_target_group.arn
+
+#   }
+
+#   condition {
+#     field = "host-header"
+#     values = ["*.example.no"]
+#   }
+# }
+
+resource "aws_autoscaling_attachment" "blue_attachement" {
+    count = length(module.blue_cluster.resources[0].autoscaling_groups)
+
+    autoscaling_group_name = module.blue_cluster.resources[0].autoscaling_groups[count.index].name
+
+    alb_target_group_arn = aws_lb_target_group.active_ingress_target_group.arn
+}
+
+
+
 
 output "private_subnet_ids" {
     value = module.network.private_subnet_ids

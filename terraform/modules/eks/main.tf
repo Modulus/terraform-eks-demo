@@ -160,9 +160,6 @@ resource "aws_eks_node_group" "main_group" {
     max_size     = 3
     min_size     = 1
   }
-
-  # Ensure that IAM Role permissions are created before and deleted after EKS Node Group handling.
-  # Otherwise, EKS will not be able to properly delete EC2 Instances and Elastic Network Interfaces.
   depends_on = [
     aws_iam_role_policy_attachment.amazonEKSWorkerNodePolicy,
     aws_iam_role_policy_attachment.amazonEKS_CNI_Policy,
@@ -186,4 +183,8 @@ output "id" {
 
 output "node_groups" {
     value = aws_eks_node_group.main_group
+}
+
+output "resources" {
+  value = aws_eks_node_group.main_group.resources
 }

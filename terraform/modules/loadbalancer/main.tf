@@ -14,3 +14,7 @@ resource "aws_lb" "alb" {
   # security_groups = var.security_group_ids
 
 }
+
+output "arn" {
+  value = aws_lb.alb.arn
+}
